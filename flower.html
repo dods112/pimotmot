@@ -5,108 +5,74 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Flowers for you ♥</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body {
-    background: linear-gradient(#0b0814, #1b1030 60%, #2a1830);
-    overflow: hidden; font-family: Georgia, serif; color: #ffe6ee;
-  }
-  .back {
-    position: fixed; top: 1rem; left: 1rem; z-index: 100; color: #fff;
-    text-decoration: none; font-style: italic; background: rgba(0,0,0,.4);
-    padding: .4rem .9rem; border-radius: 999px;
-  }
-  h1 {
-    position: absolute; top: 7vh; width: 100%; text-align: center;
-    font-style: italic; font-weight: normal; font-size: clamp(1.8rem, 5vw, 3rem); color: #ffd6e0;
-  }
-  #who {
-    position: absolute; top: 15vh; width: 100%; text-align: center;
-    font-size: clamp(1.4rem, 4vw, 2.2rem); color: #fff; text-shadow: 0 0 12px #ff8fab;
-    opacity: 0; transition: opacity 1.5s;
-  }
-  #msg {
-    position: absolute; top: 22vh; width: 100%; text-align: center; font-style: italic;
-    padding: 0 1rem; opacity: 0; transition: opacity 1.5s;
-  }
-  .show { opacity: 1 !important; }
-
-  .ground {
-    position: absolute; bottom: 0; left: 0; right: 0; height: 22vh;
-    background: linear-gradient(#0f3d2a, #06200f);
-  }
-  .light {
-    position: absolute; bottom: 20vh; width: 6px; height: 6px; border-radius: 50%;
-    background: #23f0ff; box-shadow: 0 0 8px #23f0ff;
-    animation: rise 4s linear infinite; opacity: 0;
-  }
-  .light:nth-child(odd) { background: #fffb00; box-shadow: 0 0 8px #fffb00; }
-  @keyframes rise {
-    0% { opacity: 0; transform: translateY(0); }
-    25% { opacity: 1; }
-    100% { opacity: 0; transform: translateY(-40vh); }
-  }
-
-  svg {
-    position: absolute; left: 50%; bottom: 18vh; transform: translateX(-50%);
-    width: min(60vw, 260px); height: auto; overflow: visible;
-  }
-  .stem {
-    fill: none; stroke: #7fbf7a; stroke-width: 5; stroke-linecap: round;
-    stroke-dasharray: 300; stroke-dashoffset: 300;
-    animation: grow 3s ease-out forwards;
-  }
-  @keyframes grow { to { stroke-dashoffset: 0; } }
-  .leaf {
-    fill: #5fa15a; transform-box: fill-box; transform-origin: center;
-    transform: scale(0); animation: pop 1s ease-out forwards;
-  }
-  .petal {
-    fill: #e8557a; transform-box: fill-box; transform-origin: center;
-    transform: scale(0); animation: pop 1.1s cubic-bezier(.2,.8,.3,1.2) forwards;
-  }
-  .center {
-    fill: #ffd166; transform-box: fill-box; transform-origin: center;
-    transform: scale(0); animation: pop .6s ease-out forwards;
-  }
-  @keyframes pop { to { transform: scale(1); } }
-  .l1 { animation-delay: 2s; } .l2 { animation-delay: 2.3s; }
-  .p1 { animation-delay: 3s; } .p2 { animation-delay: 3.2s; } .p3 { animation-delay: 3.4s; }
-  .p4 { animation-delay: 3.6s; } .p5 { animation-delay: 3.8s; }
-  .center { animation-delay: 4.2s; }
-
-  #renew {
-    position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 200;
-    display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center;
-    background: rgba(0,0,0,.45); padding: .6rem; border-radius: 14px;
-  }
-  #renew input { font: inherit; padding: .45rem .7rem; border-radius: 8px; border: none; min-width: 140px; }
-  #renew button {
-    font: inherit; font-style: italic; padding: .45rem 1rem; border-radius: 999px;
-    border: none; background: #e8557a; color: #fff; cursor: pointer;
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:linear-gradient(#0b0814,#1b1030 55%,#2a1830);overflow:hidden;font-family:Georgia,serif;color:#ffe6ee;position:relative}
+.back{position:fixed;top:1rem;left:1rem;z-index:100;color:#fff;text-decoration:none;font-style:italic;background:rgba(0,0,0,.4);padding:.4rem .9rem;border-radius:999px}
+h1{position:absolute;top:6vh;width:100%;text-align:center;font-style:italic;font-weight:normal;font-size:clamp(1.8rem,5vw,3rem);color:#ffd6e0;z-index:4;animation:titleIn 2s ease both}
+@keyframes titleIn{from{opacity:0;transform:translateY(-15px)}to{opacity:1;transform:none}}
+#who{display:none;position:absolute;top:14vh;width:100%;text-align:center;font-size:clamp(1.4rem,4vw,2.2rem);color:#fff;z-index:4;animation:nameIn 1.5s ease 1s both,shimmer 3s ease-in-out 2.5s infinite}
+@keyframes nameIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%,100%{text-shadow:0 0 10px #ff8fab}50%{text-shadow:0 0 25px #ff4d88,0 0 40px #ff8fab}}
+#msg{display:none;position:absolute;top:22vh;width:100%;text-align:center;font-style:italic;padding:0 1rem;z-index:4;min-height:2em;color:#ffd6e0}
+.ground{position:absolute;bottom:0;left:0;right:0;height:20vh;background:linear-gradient(#0f3d2a,#06200f);z-index:1}
+.blade{position:absolute;bottom:0;width:5px;background:linear-gradient(#7fdc8a,#1d6b35);border-radius:5px 5px 0 0;transform-origin:50% 100%;animation:bladeSway 3s ease-in-out infinite;z-index:2}
+@keyframes bladeSway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.flower-svg{position:absolute;left:50%;bottom:14vh;width:min(70vw,300px);height:auto;overflow:visible;z-index:5;transform:translateX(-50%);filter:drop-shadow(0 0 14px rgba(255,143,171,.35));animation:float 6s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
+.flower-svg *{transform-box:view-box}
+.stem{fill:none;stroke:#7fbf7a;stroke-width:6;stroke-linecap:round;stroke-dasharray:260;stroke-dashoffset:260;animation:grow 2.5s ease-out .3s forwards}
+@keyframes grow{to{stroke-dashoffset:0}}
+.stem-group{transform-origin:150px 380px;animation:stemSway 5s ease-in-out 3s infinite}
+@keyframes stemSway{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+.leaf{transform:scale(0)}
+.leaf-l{transform-origin:150px 300px;animation:unfurl 1.2s ease-out 1.8s forwards,flutterL 4s ease-in-out 3.2s infinite}
+.leaf-r{transform-origin:150px 330px;animation:unfurl 1.2s ease-out 2s forwards,flutterR 4.5s ease-in-out 3.4s infinite}
+@keyframes unfurl{to{transform:scale(1)}}
+@keyframes flutterL{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.04) rotate(-6deg)}}
+@keyframes flutterR{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.04) rotate(6deg)}}
+.head{transform-origin:150px 130px;animation:headTurn 7s ease-in-out 5s infinite}
+@keyframes headTurn{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.petal{fill:#e8557a;transform-origin:150px 130px;transform:scale(0);opacity:0;animation:bloom 1.2s cubic-bezier(.2,.9,.3,1.25) forwards}
+@keyframes bloom{to{transform:scale(1);opacity:1}}
+.p1{animation-delay:2.2s}.p2{animation-delay:2.4s}.p3{animation-delay:2.6s}.p4{animation-delay:2.8s}.p5{animation-delay:3s}.p6{animation-delay:3.2s}
+.center{fill:#ffd166;transform-origin:150px 130px;transform:scale(0);animation:centerIn .6s ease-out 4.2s forwards,centerPulse 2.5s ease-in-out 5s infinite}
+@keyframes centerIn{to{transform:scale(1)}}
+@keyframes centerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.spark{position:absolute;font-size:1.2rem;pointer-events:none;z-index:6;animation:sparkUp 2s ease-out forwards}
+@keyframes sparkUp{0%{opacity:0;transform:translate(0,0) scale(.5)}30%{opacity:1}100%{opacity:0;transform:translate(0,-70px) scale(1.2)}}
+.fall{position:absolute;top:-5vh;width:10px;height:8px;background:linear-gradient(#ffb3c6,#e8557a);border-radius:50% 0 50% 0;pointer-events:none;z-index:6;opacity:.85;animation:fall linear infinite}
+@keyframes fall{from{transform:translateY(0) rotate(0) translateX(0)}to{transform:translateY(110vh) rotate(720deg) translateX(60px)}}
+.firefly{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff06b;box-shadow:0 0 8px #fff06b;pointer-events:none;z-index:3;animation:fly ease-in-out infinite}
+@keyframes fly{0%,100%{transform:translate(0,0);opacity:.2}50%{transform:translate(30px,-40px);opacity:1}}
+#renew{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);z-index:200;display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;background:rgba(0,0,0,.45);padding:.6rem;border-radius:14px}
+#renew input{font:inherit;padding:.45rem .7rem;border-radius:8px;border:none;min-width:140px}
+#renew button{font:inherit;font-style:italic;padding:.45rem 1rem;border-radius:999px;border:none;background:#e8557a;color:#fff;cursor:pointer}
 </style>
 </head>
 <body>
 
 <a class="back" href="index.html">← back</a>
-
 <h1>Flowers for you</h1>
 <div id="who"></div>
 <div id="msg"></div>
-
 <div class="ground"></div>
 
-<svg viewBox="0 0 200 300" aria-hidden="true">
-  <path class="stem" d="M100 290 C 96 230, 106 170, 100 120" />
-  <path class="leaf l1" d="M100 230 Q 62 220 56 186 Q 88 196 100 224 Z" />
-  <path class="leaf l2" d="M100 200 Q 140 190 148 156 Q 116 166 100 194 Z" />
-  <ellipse class="petal p1" cx="100" cy="72" rx="24" ry="36" />
-  <ellipse class="petal p2" cx="132" cy="94" rx="24" ry="36" />
-  <ellipse class="petal p3" cx="120" cy="134" rx="24" ry="36" />
-  <ellipse class="petal p4" cx="80" cy="134" rx="24" ry="36" />
-  <ellipse class="petal p5" cx="68" cy="94" rx="24" ry="36" />
-  <circle class="center" cx="100" cy="104" r="15" />
+<svg class="flower-svg" viewBox="0 0 300 400" aria-hidden="true">
+  <g class="stem-group">
+    <path class="stem" d="M150 380 C146 320, 154 250, 150 140" />
+    <path class="leaf leaf-l" d="M150 300 Q100 285 88 240 Q130 250 150 285 Z" fill="#5fa15a" />
+    <path class="leaf leaf-r" d="M150 330 Q200 315 214 270 Q172 280 150 315 Z" fill="#4f9150" />
+  </g>
+  <g class="head">
+    <ellipse class="petal p1" cx="150" cy="88" rx="28" ry="42" />
+    <ellipse class="petal p2" cx="150" cy="88" rx="28" ry="42" transform="rotate(60 150 130)" />
+    <ellipse class="petal p3" cx="150" cy="88" rx="28" ry="42" transform="rotate(120 150 130)" />
+    <ellipse class="petal p4" cx="150" cy="88" rx="28" ry="42" transform="rotate(180 150 130)" />
+    <ellipse class="petal p5" cx="150" cy="88" rx="28" ry="42" transform="rotate(240 150 130)" />
+    <ellipse class="petal p6" cx="150" cy="88" rx="28" ry="42" transform="rotate(300 150 130)" />
+    <circle class="center" cx="150" cy="130" r="22" />
+  </g>
 </svg>
 
 <form id="renew">
@@ -116,40 +82,85 @@
 </form>
 
 <script>
-  const q = new URLSearchParams(location.search);
-  const name = q.get('name');
-  const message = q.get('message');
+const q = new URLSearchParams(location.search);
+const name = q.get('name');
+const message = q.get('message');
+const R = (a, b) => a + Math.random() * (b - a);
 
-  if (name) {
-    const who = document.getElementById('who');
-    who.textContent = name;
-    setTimeout(() => who.classList.add('show'), 1500);
-  }
-  if (message) {
-    const msg = document.getElementById('msg');
-    msg.textContent = message;
-    setTimeout(() => msg.classList.add('show'), 2000);
-  }
+if (name) {
+  const w = document.getElementById('who');
+  w.textContent = name;
+  w.style.display = 'block';
+}
+if (message) {
+  const m = document.getElementById('msg');
+  m.style.display = 'block';
+  setTimeout(() => typeText(m, message), 2600);
+}
+function typeText(el, t) {
+  el.textContent = '';
+  let i = 0;
+  (function s() {
+    el.textContent = t.slice(0, i++);
+    if (i <= t.length) setTimeout(s, 45);
+  })();
+}
 
-  // Glowing lights rising from the grass
-  for (let i = 0; i < 24; i++) {
-    const l = document.createElement('div');
-    l.className = 'light';
-    l.style.left = (5 + Math.random() * 90) + '%';
-    l.style.animationDelay = (Math.random() * 4) + 's';
-    document.body.appendChild(l);
-  }
+// Swaying grass
+for (let i = 0; i < 50; i++) {
+  const b = document.createElement('div');
+  b.className = 'blade';
+  b.style.left = R(0, 100) + '%';
+  b.style.height = R(40, 110) + 'px';
+  b.style.animationDelay = -R(0, 3) + 's';
+  document.body.appendChild(b);
+}
 
-  // Renew the flower with new name and message
-  document.getElementById('renew').addEventListener('submit', e => {
-    e.preventDefault();
-    const p = new URLSearchParams();
-    const n = document.getElementById('inName').value.trim();
-    const m = document.getElementById('inMsg').value.trim();
-    if (n) p.set('name', n);
-    if (m) p.set('message', m);
-    location.search = p.toString();
-  });
+// Falling petals
+for (let i = 0; i < 18; i++) {
+  const p = document.createElement('div');
+  p.className = 'fall';
+  p.style.left = R(0, 100) + '%';
+  p.style.animationDuration = R(6, 11) + 's';
+  p.style.animationDelay = -R(0, 10) + 's';
+  document.body.appendChild(p);
+}
+
+// Fireflies
+for (let i = 0; i < 16; i++) {
+  const f = document.createElement('div');
+  f.className = 'firefly';
+  f.style.left = R(5, 95) + '%';
+  f.style.top = R(20, 75) + '%';
+  f.style.animationDuration = R(5, 9) + 's';
+  f.style.animationDelay = -R(0, 5) + 's';
+  document.body.appendChild(f);
+}
+
+// Sparkles that burst from the flower center after it blooms
+const center = document.querySelector('.center');
+function spark() {
+  const r = center.getBoundingClientRect();
+  const s = document.createElement('span');
+  s.className = 'spark';
+  s.textContent = ['✨', '💖', '🌸', '⭐'][Math.floor(R(0, 4))];
+  s.style.left = (r.left + r.width / 2 + R(-120, 120)) + 'px';
+  s.style.top = (r.top + r.height / 2 + R(-100, 60)) + 'px';
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 2000);
+}
+setTimeout(() => setInterval(spark, 400), 4500);
+
+// Renew the flower with a new name and message
+document.getElementById('renew').addEventListener('submit', e => {
+  e.preventDefault();
+  const p = new URLSearchParams();
+  const n = document.getElementById('inName').value.trim();
+  const m = document.getElementById('inMsg').value.trim();
+  if (n) p.set('name', n);
+  if (m) p.set('message', m);
+  location.search = p.toString();
+});
 </script>
 </body>
 </html>

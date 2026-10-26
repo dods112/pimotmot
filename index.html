@@ -659,7 +659,13 @@ function setupMusic() {
 }
 
 // ===== Wiring (bound once) =====
-$('gift').addEventListener('click', openGift);
+$('gift').addEventListener('click', () => {
+  const bgm = $('bgm');
+  if (CONFIG.music && CONFIG.music.src && bgm.paused) {
+    bgm.play().catch(() => {});
+  }
+  openGift();
+});
 $('skip').addEventListener('click', skipIntro);
 $('btnReplay').addEventListener('click', replay);
 $('btnLetter').addEventListener('click', () => { $('envelope').classList.remove('open', 'gone'); $('sheet').classList.remove('show'); openOverlay('letter'); });

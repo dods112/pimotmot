@@ -599,7 +599,7 @@ function closeTop(fromPop) {
   const id = stack.pop();
   if (!id) return;
   $(id).classList.remove('show');
-  if (id === 'letter') { $('sheet').classList.remove('show'); $('envelope').classList.remove('open', 'gone'); }
+  if (id === 'letter') { $('sheet').classList.remove('show'); $('envelope').classList.remove('open', 'gone'); $('envCard').classList.remove('open'); }
   if (!stack.length) {
     unlockScroll();
     if (!fromPop && history.state && history.state.layer) history.back();

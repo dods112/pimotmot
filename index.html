@@ -273,7 +273,7 @@ const CONFIG = {
   totalMonths: 23,
   giftGreeting: "For my favorite person...",
   greeting: "My Favorite Person",
-  cardMessage: "[A short personal message about why she is special to you.]",
+  cardMessage: "Happy 23 months, Jo. I love you always.",
   quote: "Every day with you is another flower in our little garden.",
   letter: [
     "Happy 23th monthsary Jo hehe. Iloveyou so much Jo hehe.",
@@ -471,7 +471,7 @@ function build(intro) {
   const field = $('garden');
   field.innerHTML = '';
   const W = innerWidth, H = innerHeight, ph = phone(), cx = W / 2, cy = H / 2;
-  const rx = (ph ? 0.46 : 0.34) * W, ry = (ph ? 0.38 : 0.40) * H;
+  const rx = (ph ? 0.48 : 0.34) * W, ry = (ph ? 0.52 : 0.40) * H;
   const inside = (x, y) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 < 1;
   const cell = ph ? Math.max(64, Math.min(W, H) / 3) : Math.max(64, Math.min(W, H) / 3.2);
   const items = [];

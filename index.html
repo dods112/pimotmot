@@ -7,13 +7,38 @@
 <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{background:#3e0a12;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,serif;overflow:hidden}
+html,body{width:100%;height:100%;overflow:hidden}
+body{background:#3B0710;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,serif;position:relative}
 .script{font-family:"Great Vibes",cursive;font-weight:400}
-#gift-scene{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;background:radial-gradient(ellipse at center,#7a1a29 0%,#4a0c16 60%,#2c060d 100%);z-index:4;transition:opacity 1s ease}
+
+/* Layer 1-4: the flower field */
+#garden{position:fixed;inset:0;width:100vw;height:100dvh;overflow:hidden;pointer-events:none;z-index:1}
+.flower{position:absolute;pointer-events:none}
+.flower img{width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;
+  animation:sway var(--dur,7s) ease-in-out var(--delay,0s) infinite alternate;transform-origin:50% 60%}
+@keyframes sway{
+  from{transform:rotate(calc(var(--rot) - 4deg)) translateY(0)}
+  to{transform:rotate(calc(var(--rot) + 4deg)) translateY(-6px)}
+}
+.flower.pop{animation:pop 1s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* Layer 5: falling petals */
+.petal{position:fixed;top:-60px;pointer-events:none;z-index:2;animation:fall linear infinite;opacity:.9}
+@keyframes fall{
+  from{transform:translate(0,-8vh) rotate(0deg)}
+  to{transform:translate(28vw,118vh) rotate(540deg)}
+}
+
+/* soft dark veil so the greeting stays readable */
+#veil{position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:radial-gradient(ellipse at center,rgba(59,7,16,.6) 0%,rgba(59,7,16,.25) 55%,rgba(59,7,16,.05) 100%)}
+
+/* Layer 6: greeting and gift */
+#gift-scene{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;z-index:5;transition:opacity 1s ease}
 #gift-scene.gone{opacity:0;pointer-events:none}
-#greet{font-size:clamp(1.8rem,6vw,2.8rem);text-align:center;padding:0 1rem;opacity:0;animation:up 1.6s ease .3s forwards}
-.gift{position:relative;width:min(44vw,180px);height:min(40vw,160px);background:none;border:0;cursor:pointer;animation:float 3.2s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
+#greet{font-size:clamp(1.8rem,6vw,2.8rem);text-align:center;padding:0 1rem;text-shadow:0 2px 14px rgba(0,0,0,.6);opacity:0;animation:up 1.6s ease 3s forwards}
+.gift{position:relative;width:min(44vw,180px);height:min(40vw,160px);background:none;border:0;cursor:pointer;animation:float 3.2s ease-in-out infinite;-webkit-tap-highlight-color:transparent;pointer-events:auto;opacity:0;animation:float 3.2s ease-in-out infinite,up 1.2s ease 3.4s forwards}
 .gift .base{position:absolute;left:0;bottom:0;width:100%;height:66%;background:linear-gradient(90deg,#a81f3a,#e0506f 50%,#a81f3a);border-radius:5px;box-shadow:0 14px 28px rgba(0,0,0,.45);transition:transform .8s ease}
 .gift .lid{position:absolute;left:-5%;top:20%;width:110%;height:24%;background:linear-gradient(90deg,#c52d4d,#f4758f 50%,#c52d4d);border-radius:5px;box-shadow:0 6px 14px rgba(0,0,0,.35);transition:transform 1s cubic-bezier(.3,1.5,.5,1),opacity .9s ease}
 .rib{position:absolute;top:0;bottom:0;left:50%;width:14%;transform:translateX(-50%);background:#ffe3ea}
@@ -24,12 +49,13 @@ body{background:#3e0a12;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,s
 .gift.open .lid{transform:translateY(-130px) rotate(-22deg);opacity:0}
 .gift.open .base{transform:scale(.94)}
 .gift.open .bow{opacity:0}
-#hint{font-size:1rem;letter-spacing:.2em;text-transform:uppercase;animation:blink 2s ease-in-out infinite}
+#hint{font-size:1rem;letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:blink 2s ease-in-out 4s infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 @keyframes blink{0%,100%{opacity:.3}50%{opacity:.9}}
 @keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;transition:opacity 1.5s ease}
-#scrap{position:fixed;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 1.6s ease;z-index:3;background:radial-gradient(ellipse at 50% 30%,#8a2234 0%,#4a0c16 70%,#2c060d 100%)}
+
+/* scrapbook and letter */
+#scrap{position:fixed;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 1.6s ease;z-index:4;background:radial-gradient(ellipse at 50% 30%,#8a2234 0%,#4a0c16 70%,#2c060d 100%)}
 #scrap.show{opacity:1;pointer-events:auto}
 .scrap-inner{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:3rem 1.2rem 5rem;gap:1.6rem}
 .kicker{font-size:1rem;letter-spacing:.25em;text-transform:uppercase;color:#f5c2cf;text-align:center}
@@ -48,9 +74,18 @@ body{background:#3e0a12;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,s
 .letter-paper .to{font-family:"Great Vibes",cursive;font-size:2.2rem;margin:.6rem 0}
 .letter-paper p{font-size:1.15rem;line-height:1.7;margin-bottom:1rem}
 .letter-close{position:absolute;top:.5rem;right:.8rem;background:none;border:0;font-size:1.8rem;color:#7a2a3a;cursor:pointer}
+
+@media (prefers-reduced-motion: reduce){
+  .flower img,.petal,.gift,#hint{animation:none !important}
+  .flower.pop{animation:none}
+}
 </style>
 </head>
 <body>
+
+<div id="garden"></div>
+<div id="veil"></div>
+<div id="petals"></div>
 
 <section id="gift-scene">
   <p id="greet" class="script"></p>
@@ -61,8 +96,6 @@ body{background:#3e0a12;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,s
   </button>
   <p id="hint">Tap the gift</p>
 </section>
-
-<canvas id="fx"></canvas>
 
 <section id="scrap" aria-hidden="true">
   <div class="scrap-inner">
@@ -109,12 +142,13 @@ const CONFIG = {
   finalMessage: "Every day with you is another flower in our little garden."
 };
 
+// Flower images saved in the flowers folder
 const FLOWER_FILES = [
   "flowers/flower1.webp", "flowers/flower2.webp", "flowers/flower3.webp",
   "flowers/flower4.webp", "flowers/flower5.webp", "flowers/flower6.webp"
 ];
 
-// ===== Fill the page from CONFIG =====
+// ===== Fill text from CONFIG =====
 document.getElementById('greet').textContent = CONFIG.greeting;
 document.getElementById('kicker').textContent = CONFIG.monthsaryDate + " · " + CONFIG.monthsCount;
 document.getElementById('title').textContent = CONFIG.title;
@@ -124,258 +158,228 @@ document.getElementById('final').textContent = CONFIG.finalMessage;
 document.getElementById('fromLine').textContent = "From: " + CONFIG.myName;
 document.getElementById('toLine').textContent = "To: " + CONFIG.herName;
 document.getElementById('letterDate').textContent = "Date: " + CONFIG.monthsaryDate;
-const body = document.getElementById('letterBody');
-CONFIG.letter.forEach(t => { const p = document.createElement('p'); p.textContent = t; body.appendChild(p); });
-
-// ===== Canvas =====
-const cv = document.getElementById('fx');
-const ctx = cv.getContext('2d');
-let W, H, DPR;
-function resize() {
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
-  W = window.innerWidth; H = window.innerHeight;
-  cv.width = W * DPR; cv.height = H * DPR;
-  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-}
-window.addEventListener('resize', resize);
-resize();
-
-const rnd = (a, b) => a + Math.random() * (b - a);
-
-// ===== Sprites: remove the outer white/checkered background =====
-function scaledSprite(img, size) {
-  const c = document.createElement('canvas');
-  c.width = c.height = size;
-  const x = c.getContext('2d', { willReadFrequently: true });
-  const k = Math.min(size / img.width, size / img.height);
-  const w = img.width * k, h = img.height * k;
-  x.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
-  try {
-    const d = x.getImageData(0, 0, size, size);
-    const px = d.data;
-    const isBg = i => {
-      const r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
-      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
-      return mx > 190 && mx - mn < 28;
-    };
-    const seen = new Uint8Array(size * size);
-    const stack = [];
-    const addIfBg = i => { if (!seen[i] && isBg(i)) { seen[i] = 1; stack.push(i); } };
-    for (let j = 0; j < size; j++) {
-      addIfBg(j); addIfBg((size - 1) * size + j);
-      addIfBg(j * size); addIfBg(j * size + size - 1);
-    }
-    while (stack.length) {
-      const i = stack.pop();
-      px[i * 4 + 3] = 0;
-      const cx = i % size, cy = (i / size) | 0;
-      if (cx > 0) addIfBg(i - 1);
-      if (cx < size - 1) addIfBg(i + 1);
-      if (cy > 0) addIfBg(i - size);
-      if (cy < size - 1) addIfBg(i + size);
-    }
-    x.putImageData(d, 0, 0);
-  } catch (e) { /* keep the image as-is if blocked */ }
-  return c;
-}
-function petalSprite(color, r) {
-  const c = document.createElement('canvas');
-  const s = r * 2 + 4;
-  c.width = c.height = s;
-  const x = c.getContext('2d');
-  x.translate(s / 2, s / 2);
-  for (let i = 0; i < 5; i++) {
-    x.rotate(Math.PI * 2 / 5);
-    x.beginPath();
-    x.ellipse(0, -r * 0.5, r * 0.32, r * 0.5, 0, 0, Math.PI * 2);
-    x.fillStyle = color;
-    x.fill();
-  }
-  return c;
-}
-const FALLBACK = [petalSprite('#e8557a', 14), petalSprite('#ff8fab', 22), petalSprite('#f5c2cf', 30)];
-const IMG_SPRITES = [];
-FLOWER_FILES.forEach(src => {
-  const im = new Image();
-  im.onload = () => { [90, 120, 150].forEach(sz => IMG_SPRITES.push(scaledSprite(im, sz))); };
-  im.src = src;
+CONFIG.letter.forEach(t => {
+  const p = document.createElement('p');
+  p.textContent = t;
+  document.getElementById('letterBody').appendChild(p);
 });
-const pick = () => {
-  const list = IMG_SPRITES.length ? IMG_SPRITES : FALLBACK;
-  return list[(Math.random() * list.length) | 0];
-};
 
-// ===== Water pile model =====
-// The screen floor is split into columns. Each column stores how tall the pile is.
-// A flower that lands raises its column, so the pile grows up the screen.
-const BUCKET = 22;
-let NB = 0, heights = null;
-function initPile() {
-  NB = Math.ceil(W / BUCKET) + 1;
-  heights = new Float32Array(NB);
-}
-function colIndex(x) { return Math.max(0, Math.min(NB - 1, Math.floor(x / BUCKET))); }
-function pileTop(x) { return H - heights[colIndex(x)]; }
-function isFull() {
-  let m = 0;
-  for (let i = 0; i < NB; i++) if (heights[i] > m) m = heights[i];
-  let lowest = Infinity; for (let i = 0; i < NB; i++) if (heights[i] < lowest) lowest = heights[i]; return lowest >= H * 0.9;
-}
-
-// ===== Particles =====
-const FOUNTAIN_MS = 40000;
-const MIN_FOUNTAIN_MS = 3000;
-const MAX = 2400;
-let parts = [];
-let phase = 'idle';   // idle -> fountain -> boom -> done
-let t0 = null, flash = 0, boomX = 0, boomY = 0;
-
-function spawnJet(prog) {
-  const k = Math.sqrt(H / 900);
-  const jets = [W * 0.2, W * 0.5, W * 0.8];
-  const fx = jets[(Math.random() * jets.length) | 0];
-  const ang = -Math.PI / 2 + rnd(-0.35, 0.35);
-  const sp = rnd(18, 24) * k * (0.9 + prog * 0.2);
-  const img = pick();
-  const target = rnd(0.6, 1.1);
-  parts.push({
-    state: 'air',
-    x: fx + rnd(-14, 14), y: H - 6,
-    vx: Math.cos(ang) * sp * 0.6, vy: Math.sin(ang) * sp,
-    rot: rnd(0, 6.28), vr: rnd(-0.06, 0.06),
-    s: 0.2, target, g: 0.35,
-    half: img.height * target * 0.5,
-    life: 1, decay: 0, drag: 1, img
-  });
-}
-
-function land(p) {
-  const idx = colIndex(p.x);
-  const add = p.img.height * p.s * 1.0;
-  p.state = 'rest';
-  p.vx = 0; p.vy = 0; p.g = 0;
-  p.y = pileTop(p.x) - p.img.height * p.s * 0.3;
-  heights[idx] = Math.min(H * 0.95, heights[idx] + add);
-  if (idx > 0) heights[idx - 1] = Math.min(H * 0.95, heights[idx - 1] + add * 0.5);
-  if (idx < NB - 1) heights[idx + 1] = Math.min(H * 0.95, heights[idx + 1] + add * 0.5);
-}
-
-function startBoom() {
-  phase = 'boom';
-  boomX = W / 2; boomY = H * 0.45;
-  parts.forEach(p => {
-    if (p.state === 'fly') return;
-    const dx = p.x - boomX, dy = p.y - boomY;
-    const d = Math.hypot(dx, dy) || 1;
-    const sp = rnd(8, 22);
-    p.state = 'fly';
-    p.vx = (dx / d) * sp + rnd(-1.5, 1.5);
-    p.vy = (dy / d) * sp + rnd(-1.5, 1.5);
-    p.g = 0.12; p.drag = 0.985;
-    p.vr = rnd(-0.25, 0.25);
-    p.s = p.target;
-    p.decay = rnd(0.004, 0.008);
-  });
-  for (let i = 0; i < 140; i++) {
-    const a = rnd(0, Math.PI * 2), sp = rnd(6, 24);
-    parts.push({
-      state: 'fly', x: boomX, y: boomY,
-      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
-      rot: rnd(0, 6.28), vr: rnd(-0.2, 0.2), s: rnd(0.4, 1.0), target: 1,
-      g: 0.1, drag: 0.98, life: 1, decay: rnd(0.006, 0.012), img: pick()
-    });
-  }
-  flash = 1;
-  setTimeout(openAfterBoom, 1800);
-}
-
-function tick(now) {
-  if (t0 === null) t0 = now;
-  const t = now - t0;
-  ctx.clearRect(0, 0, W, H);
-
-  if (phase === 'fountain') {
-    const prog = Math.min(1, t / FOUNTAIN_MS);
-    const n = Math.floor(6 + prog * 14);
-    for (let i = 0; i < n && parts.length < MAX; i++) spawnJet(prog);
-    if ((t >= MIN_FOUNTAIN_MS && isFull()) || t >= FOUNTAIN_MS) startBoom();
-  }
-
-  for (const p of parts) {
-    if (p.state === 'air') {
-      p.vy += p.g;
-      p.x += p.vx; p.y += p.vy;
-      p.vx *= 0.995;
-      p.rot += p.vr;
-      if (p.s < p.target) p.s = Math.min(p.target, p.s + 0.08);
-      if (p.vy > 0 && p.y + p.half >= pileTop(p.x)) land(p);
-    } else if (p.state === 'fly') {
-      p.x += p.vx; p.y += p.vy;
-      p.vx *= p.drag;
-      p.vy = p.vy * p.drag + p.g;
-      p.rot += p.vr;
-      p.life -= p.decay;
-    }
-    if (p.life <= 0) continue;
-    ctx.save();
-    ctx.globalAlpha = Math.min(1, p.life);
-    ctx.translate(p.x, p.y);
-    ctx.rotate(p.rot);
-    ctx.scale(p.s, p.s);
-    ctx.drawImage(p.img, -p.img.width / 2, -p.img.height / 2);
-    ctx.restore();
-  }
-  parts = parts.filter(p => p.life > 0 && (p.state !== 'fly' || (p.y > -200 && p.y < H + 200 && p.x > -200 && p.x < W + 200)));
-
-  if (flash > 0.01) {
-    const g = ctx.createRadialGradient(boomX, boomY, 0, boomX, boomY, Math.max(W, H) * 0.6);
-    g.addColorStop(0, 'rgba(255,225,235,' + (flash * 0.5) + ')');
-    g.addColorStop(1, 'rgba(255,225,235,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-    flash *= 0.9;
-  }
-
-  if (phase !== 'idle' && (phase !== 'done' || parts.length || flash > 0.01)) {
-    requestAnimationFrame(tick);
-  }
-}
-
-// ===== Scene control =====
+// ===== Setup =====
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const garden = document.getElementById('garden');
+const petalBox = document.getElementById('petals');
+const veil = document.getElementById('veil');
 const giftEl = document.getElementById('gift');
 const giftScene = document.getElementById('gift-scene');
 const scrap = document.getElementById('scrap');
 const letter = document.getElementById('letter');
+
+let sprites = [];
+let wraps = [];
+let booted = false;
+let exploded = false;
+let resizeTimer = null;
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = () => sprites[(Math.random() * sprites.length) | 0];
+
+// ===== Remove the white/checkered background from each flower =====
+function loadImage(src) {
+  return new Promise(res => {
+    const i = new Image();
+    i.onload = () => res(i);
+    i.onerror = () => res(null);
+    i.src = src;
+  });
+}
+function cutoutURL(img) {
+  const S = 256;
+  const c = document.createElement('canvas');
+  c.width = c.height = S;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  const k = Math.min(S / img.naturalWidth, S / img.naturalHeight);
+  const w = img.naturalWidth * k, h = img.naturalHeight * k;
+  x.drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
+  try {
+    const d = x.getImageData(0, 0, S, S);
+    const px = d.data;
+    const isBg = i => {
+      const r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      return mx > 200 && mx - mn < 30;
+    };
+    const seen = new Uint8Array(S * S);
+    const stack = [];
+    const add = i => { if (!seen[i] && isBg(i)) { seen[i] = 1; stack.push(i); } };
+    for (let j = 0; j < S; j++) {
+      add(j); add((S - 1) * S + j); add(j * S); add(j * S + S - 1);
+    }
+    while (stack.length) {
+      const i = stack.pop();
+      px[i * 4 + 3] = 0;
+      const cx = i % S, cy = (i / S) | 0;
+      if (cx > 0) add(i - 1);
+      if (cx < S - 1) add(i + 1);
+      if (cy > 0) add(i - S);
+      if (cy < S - 1) add(i + S);
+    }
+    x.putImageData(d, 0, 0);
+  } catch (e) { /* keep original if the browser blocks it */ }
+  return c.toDataURL('image/png');
+}
+function petalURL(color) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const x = c.getContext('2d');
+  x.translate(32, 32);
+  for (let i = 0; i < 5; i++) {
+    x.rotate(Math.PI * 2 / 5);
+    x.beginPath();
+    x.ellipse(0, -16, 10, 16, 0, 0, Math.PI * 2);
+    x.fillStyle = color;
+    x.fill();
+  }
+  return c.toDataURL('image/png');
+}
+async function getSprites() {
+  const loaded = (await Promise.all(FLOWER_FILES.map(loadImage))).filter(Boolean);
+  const cut = loaded.map(im => { try { return cutoutURL(im); } catch (e) { return im.src; } });
+  const ready = (await Promise.all(cut.map(loadImage))).filter(Boolean);
+  if (!ready.length) return [petalURL('#e8557a'), petalURL('#ff8fab'), petalURL('#f5c2cf')];
+  return ready.map(i => i.src);
+}
+
+// ===== Build the flower field: edges and corners included =====
+function build(intro) {
+  garden.innerHTML = '';
+  wraps = [];
+  const W = window.innerWidth, H = window.innerHeight;
+  const cell = Math.max(80, Math.min(W, H) / 7);
+  const cols = Math.ceil(W / cell) + 2;
+  const rows = Math.ceil(H / cell) + 2;
+  const cx = W / 2, cy = H / 2;
+  const maxD = Math.hypot(cx, cy) || 1;
+
+  const small = [], big = [];
+  for (let r = -1; r < rows - 1; r++) {
+    for (let c = -1; c < cols - 1; c++) {
+      const ox = (c + 0.5) * cell + rand(-0.35, 0.35) * cell;
+      const oy = (r + 0.5) * cell + rand(-0.35, 0.35) * cell;
+      small.push({ ox, oy, size: cell * rand(1.25, 1.6), z: 2, op: rand(0.8, 0.95) });
+      if (Math.random() < 0.7) {
+        big.push({ ox: ox + rand(-0.2, 0.2) * cell, oy: oy + rand(-0.2, 0.2) * cell,
+                   size: cell * rand(1.7, 2.2), z: 3, op: 1 });
+      }
+    }
+  }
+
+  [...small, ...big].forEach(it => {
+    const dx = it.ox - cx, dy = it.oy - cy;
+    const dist = Math.hypot(dx, dy) / maxD;   // 0 = center, 1 = corner
+
+    const wrap = document.createElement('div');
+    wrap.className = 'flower';
+    wrap.style.cssText = `left:${it.ox - it.size / 2}px;top:${it.oy - it.size / 2}px;width:${it.size}px;height:${it.size}px;z-index:${it.z}`;
+    wrap._dx = dx; wrap._dy = dy; wrap._d = dist;
+
+    const img = document.createElement('img');
+    img.src = pick();
+    img.alt = '';
+    img.draggable = false;
+    const rot = rand(-45, 45);
+    img.style.setProperty('--rot', rot + 'deg');
+    img.style.setProperty('--dur', rand(5, 9).toFixed(2) + 's');
+    img.style.setProperty('--delay', (-rand(0, 8)).toFixed(2) + 's');
+    img.style.opacity = it.op;
+    wrap.appendChild(img);
+    garden.appendChild(wrap);
+    wraps.push(wrap);
+
+    if (intro) {
+      // edges arrive first, flowers fly in toward the center
+      const delay = (1 - dist) * 1500 + rand(0, 600);
+      wrap.animate([
+        { transform: `translate(${dx * 1.3}px, ${dy * 1.3}px) scale(0.25) rotate(${rand(-180, 180)}deg)`, opacity: 0 },
+        { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 }
+      ], { duration: rand(1100, 1700), delay, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' });
+    }
+  });
+}
+
+// ===== Falling petals =====
+function makePetals() {
+  petalBox.innerHTML = '';
+  if (reduced) return;
+  for (let i = 0; i < 16; i++) {
+    const p = document.createElement('img');
+    p.className = 'petal';
+    p.src = pick();
+    p.alt = '';
+    p.style.width = rand(22, 40) + 'px';
+    p.style.left = rand(-10, 90) + 'vw';
+    p.style.animationDuration = rand(10, 18).toFixed(2) + 's';
+    p.style.animationDelay = (-rand(0, 18)).toFixed(2) + 's';
+    petalBox.appendChild(p);
+  }
+}
+
+// ===== Occasional small bloom on a random flower =====
+setInterval(() => {
+  if (exploded || reduced || !wraps.length) return;
+  const w = wraps[(Math.random() * wraps.length) | 0];
+  w.classList.remove('pop');
+  void w.offsetWidth;
+  w.classList.add('pop');
+}, 2200);
+
+// ===== Gift tap: flowers burst outward from the center =====
+function explode() {
+  exploded = true;
+  wraps.forEach(w => {
+    w.classList.remove('pop');
+    w.animate([
+      { transform: 'translate(0,0) scale(1)', opacity: 1 },
+      { transform: `translate(${w._dx * 2.6}px, ${w._dy * 2.6}px) scale(1.5)`, opacity: 0 }
+    ], { duration: rand(1100, 1700), delay: w._d * 400 + rand(0, 250),
+         easing: 'cubic-bezier(.4,0,.9,.6)', fill: 'forwards' });
+  });
+  veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 1400, fill: 'forwards' });
+}
 
 function showScrap() {
   giftScene.classList.add('gone');
   scrap.classList.add('show');
   scrap.setAttribute('aria-hidden', 'false');
 }
-function openAfterBoom() {
-  phase = 'done';
-  showScrap();
-  letter.classList.add('show');
-  cv.style.opacity = '0';
-}
 
 function start() {
-  if (phase !== 'idle') return;
+  if (!booted || exploded) return;
   giftEl.classList.add('open');
   document.getElementById('hint').style.display = 'none';
   if (reduced) {
-    setTimeout(() => { showScrap(); letter.classList.add('show'); phase = 'done'; }, 700);
+    exploded = true;
+    setTimeout(() => { showScrap(); letter.classList.add('show'); }, 700);
     return;
   }
-  giftScene.classList.add('gone');
-  initPile();
-  phase = 'fountain';
-  t0 = null;
-  requestAnimationFrame(tick);
+  explode();
+  setTimeout(() => giftScene.classList.add('gone'), 900);
+  setTimeout(() => { showScrap(); letter.classList.add('show'); }, 2300);
 }
-giftEl.addEventListener('click', start);
 
+// ===== Boot =====
+getSprites().then(s => {
+  sprites = s;
+  build(!reduced);     // intro burst on load
+  makePetals();
+  booted = true;
+});
+
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (booted && !exploded) build(false); }, 300);
+});
+
+giftEl.addEventListener('click', start);
 document.getElementById('openLetter').addEventListener('click', () => letter.classList.add('show'));
 document.getElementById('closeLetter').addEventListener('click', () => letter.classList.remove('show'));
 letter.addEventListener('click', e => { if (e.target === letter) letter.classList.remove('show'); });
@@ -383,6 +387,3 @@ document.getElementById('replay').addEventListener('click', () => location.reloa
 </script>
 </body>
 </html>
-
-
-

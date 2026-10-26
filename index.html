@@ -472,19 +472,20 @@ function build(intro) {
   const W = innerWidth, H = innerHeight, ph = phone(), cx = W / 2, cy = H / 2;
   const rx = (ph ? 0.46 : 0.34) * W, ry = (ph ? 0.38 : 0.40) * H;
   const inside = (x, y) => ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 < 1;
-  const cell = ph ? Math.max(80, Math.min(W, H) / 3.4) : Math.max(80, Math.min(W, H) / 3.8);
+  const cell = ph ? Math.max(64, Math.min(W, H) / 3) : Math.max(64, Math.min(W, H) / 3.2);
   const items = [];
   for (let gy = -1; gy < Math.ceil(H / cell) + 1; gy++) {
     for (let gx = -1; gx < Math.ceil(W / cell) + 1; gx++) {
       const ox = (gx + .5) * cell + rand(-.3, .3) * cell, oy = (gy + .5) * cell + rand(-.3, .3) * cell;
       if (!inside(ox, oy)) items.push({ ox, oy, size: cell * rand(.95, 1.25), z: 2, small: false });
-      if (Math.random() < (ph ? .35 : .55)) {
+      if (!inside(ox + rand(-.5, .5) * cell, oy + rand(-.5, .5) * cell) && Math.random() < .6) items.push({ ox: ox + rand(-.5, .5) * cell, oy: oy + rand(-.5, .5) * cell, size: cell * rand(.8, 1.1), z: 2, small: false });
+      if (Math.random() < (ph ? .6 : .85)) {
         const sx = ox + rand(-.4, .4) * cell, sy = oy + rand(-.4, .4) * cell;
         if (!inside(sx, sy)) items.push({ ox: sx, oy: sy, size: cell * rand(.45, .6), z: 3, small: true });
       }
     }
   }
-  const max = ph ? 42 : 96;
+  const max = ph ? 80 : 170;
   while (items.length > max) items.splice((Math.random() * items.length) | 0, 1);
 
   items.forEach(it => {

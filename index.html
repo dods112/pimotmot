@@ -17,7 +17,8 @@ button{font:inherit;cursor:pointer}
 body.ready #glow{opacity:1}
 #garden{z-index:1}
 #petals{z-index:2}
-#veil{z-index:3;background:radial-gradient(ellipse at center,rgba(59,7,16,.7) 0%,rgba(59,7,16,.3) 55%,rgba(59,7,16,.05) 100%);transition:opacity 1.4s ease}
+#veil{z-index:3;opacity:0;background:radial-gradient(ellipse at center,rgba(59,7,16,.7) 0%,rgba(59,7,16,.3) 55%,rgba(59,7,16,.05) 100%);transition:opacity 1.4s ease}
+body.bursting #veil,body.revealed #veil{opacity:1}
 
 .flower{position:absolute;pointer-events:none}
 .flower img{width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;transform-origin:50% 60%;animation:sway var(--dur,7s) ease-in-out var(--delay,0s) infinite alternate}
@@ -26,7 +27,29 @@ body.ready #glow{opacity:1}
 @keyframes fall{from{transform:translate(0,-8vh) rotate(0deg)}to{transform:translate(28vw,118vh) rotate(540deg)}}
 .bp{position:absolute;width:46px;height:46px;object-fit:contain;pointer-events:none}
 
-#hero{position:fixed;inset:0;z-index:5;overflow-y:auto;padding:1.2rem;pointer-events:auto}
+/* Gift opening screen */
+#giftScene{position:fixed;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;padding:1rem;transition:opacity 1.2s ease}
+#giftScene.gone{opacity:0;pointer-events:none}
+#giftGreet{font-family:"Great Vibes",cursive;font-size:clamp(1.8rem,6vw,2.8rem);text-align:center;color:var(--ivory);text-shadow:0 2px 14px rgba(0,0,0,.6)}
+.gift{position:relative;width:min(44vw,180px);height:min(40vw,160px);background:none;border:0;cursor:pointer;animation:float 3.2s ease-in-out infinite;-webkit-tap-highlight-color:transparent}
+.gift .base{position:absolute;left:0;bottom:0;width:100%;height:66%;background:linear-gradient(90deg,#a81f3a,#e0506f 50%,#a81f3a);border-radius:5px;box-shadow:0 14px 28px rgba(0,0,0,.45);transition:transform .8s ease}
+.gift .lid{position:absolute;left:-5%;top:20%;width:110%;height:24%;background:linear-gradient(90deg,#c52d4d,#f4758f 50%,#c52d4d);border-radius:5px;box-shadow:0 6px 14px rgba(0,0,0,.35);transition:transform 1s cubic-bezier(.3,1.5,.5,1),opacity .9s ease}
+.rib{position:absolute;top:0;bottom:0;left:50%;width:14%;transform:translateX(-50%);background:#ffe3ea}
+.gift .bow{position:absolute;top:-30%;left:50%;width:46%;height:52%;transform:translateX(-50%);transition:opacity .4s}
+.bow span{position:absolute;top:0;width:50%;height:100%;border:7px solid #ffe3ea;border-radius:50%}
+.bow span:first-child{left:0;transform:rotate(-30deg)}
+.bow span:last-child{right:0;transform:rotate(30deg)}
+.gift.open .lid{transform:translateY(-130px) rotate(-22deg);opacity:0}
+.gift.open .base{transform:scale(.94)}
+.gift.open .bow{opacity:0}
+.gift:focus-visible{outline:2px solid var(--gold);outline-offset:6px}
+#hint{font-size:1rem;letter-spacing:.2em;text-transform:uppercase;color:var(--blush);animation:blink 2s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:.9}}
+
+/* Hero */
+#hero{position:fixed;inset:0;z-index:5;overflow-y:auto;padding:1.2rem;visibility:hidden;pointer-events:none}
+body.revealed #hero{visibility:visible;pointer-events:auto}
 #heroInner{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;text-align:center}
 .rv{opacity:0;transform:translateY(16px);transition:opacity 1.4s ease var(--d,0s),transform 1.4s ease var(--d,0s)}
 body.revealed .rv{opacity:1;transform:none}
@@ -38,7 +61,7 @@ body.revealed .rv{opacity:1;transform:none}
 .seal{position:absolute;right:14px;bottom:-14px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e0506f,#8a1630);color:var(--ivory);display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 10px rgba(0,0,0,.35)}
 .quote{font-family:"Great Vibes",cursive;font-size:clamp(1.6rem,4.5vw,2.2rem);line-height:1.35;max-width:600px;color:var(--ivory);text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .btns{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center;margin-top:.4rem}
-.btn{color:#fff;background:var(--rose);border:0;padding:.7rem 1.5rem;border-radius:999px;font-style:italic;font-size:1.1rem;box-shadow:0 8px 18px rgba(0,0,0,.35);transition:transform .2s ease;pointer-events:auto}
+.btn{color:#fff;background:var(--rose);border:0;padding:.7rem 1.5rem;border-radius:999px;font-style:italic;font-size:1.1rem;box-shadow:0 8px 18px rgba(0,0,0,.35);transition:transform .2s ease}
 .btn:hover{transform:translateY(-2px)}
 .btn.ghost{background:transparent;border:1px solid var(--gold);color:var(--ivory)}
 .btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
@@ -67,7 +90,7 @@ body.revealed .rv{opacity:1;transform:none}
 .gback{margin-top:.6rem}
 
 @media (prefers-reduced-motion: reduce){
-  .flower img,.petal,#hero *,.slot img{animation:none !important}
+  .flower img,.petal,.gift,#hint,.slot img{animation:none !important}
   .rv{transition:none}
 }
 </style>
@@ -78,6 +101,16 @@ body.revealed .rv{opacity:1;transform:none}
 <div id="garden" class="layer"></div>
 <div id="petals" class="layer"></div>
 <div id="veil" class="layer"></div>
+
+<section id="giftScene">
+  <p id="giftGreet"></p>
+  <button id="gift" class="gift" aria-label="Open your gift">
+    <div class="lid"><div class="rib"></div></div>
+    <div class="base"><div class="rib"></div></div>
+    <div class="bow"><span></span><span></span></div>
+  </button>
+  <p id="hint">Tap the gift</p>
+</section>
 
 <section id="hero">
   <div id="heroInner">
@@ -100,7 +133,7 @@ body.revealed .rv{opacity:1;transform:none}
 <button id="musicBtn" hidden>Play music</button>
 <audio id="bgm" loop preload="none"></audio>
 
-<div id="letter" class="overlay" role="dialog" aria-modal="true" aria-labelledby="letterTitle">
+<div id="letter" class="overlay" role="dialog" aria-modal="true" aria-labelledby="fromLine">
   <div class="sheet">
     <button class="close" id="closeLetter" aria-label="Close letter">×</button>
     <p class="from" id="fromLine"></p>
@@ -126,6 +159,7 @@ const CONFIG = {
   herName: "[HER NAME]",
   monthsaryDate: "[OUR MONTHSARY DATE]",
   monthsCount: "[NUMBER] months",
+  giftGreeting: "For my favorite person...",
   greeting: "My Favorite Person",
   cardMessage: "[A short personal message about why she is special to you.]",
   quote: "Every day with you is another flower in our little garden.",
@@ -158,13 +192,14 @@ const FLOWER_FILES = [
 const $ = id => document.getElementById(id);
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const garden = $('garden'), petalBox = $('petals');
-let sprites = [], wraps = [], timers = [], revealed = false, typeTimer = null;
+let sprites = [], wraps = [], timers = [], revealed = false, opened = false, typeTimer = null;
 const rand = (a, b) => a + Math.random() * (b - a);
 const pick = () => sprites[(Math.random() * sprites.length) | 0];
 const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 function clearTimers() { timers.forEach(clearTimeout); timers = []; }
 
 // ===== Fill text from CONFIG =====
+$('giftGreet').textContent = CONFIG.giftGreeting;
 $('kicker').textContent = CONFIG.monthsaryDate + " · " + CONFIG.monthsCount;
 $('heading').textContent = CONFIG.greeting;
 $('forLine').textContent = "For " + CONFIG.herName;
@@ -314,25 +349,45 @@ document.addEventListener('pointerdown', e => {
   burst(e.clientX, e.clientY);
 });
 
-// ===== Intro, reveal and replay =====
+// ===== Gift opening: burst, then greeting =====
 function reveal() {
   revealed = true;
+  document.body.classList.remove('bursting');
   document.body.classList.add('revealed');
 }
-function playIntro() {
-  clearTimers();
-  revealed = false;
-  document.body.classList.remove('revealed');
-  build(true);
-  makePetals();
-  later(reveal, reduced ? 0 : 3000);
+function openGift() {
+  if (!sprites.length || opened) return;
+  opened = true;
+  $('gift').classList.add('open');
+  $('hint').style.display = 'none';
+  document.body.classList.add('bursting');
+  later(() => { build(true); makePetals(); }, reduced ? 0 : 900);
+  later(() => $('giftScene').classList.add('gone'), reduced ? 0 : 1500);
+  later(reveal, reduced ? 0 : 3600);
 }
+$('gift').addEventListener('click', openGift);
+
+// ===== Replay: back to the gift, tap again for a fresh burst =====
 function closeAll() {
   $('letter').classList.remove('show');
   const g = $('gardenView');
   g.classList.remove('show', 'open');
   clearInterval(typeTimer);
 }
+function replay() {
+  clearTimers();
+  closeAll();
+  revealed = false;
+  opened = false;
+  document.body.classList.remove('revealed', 'bursting');
+  garden.innerHTML = '';
+  wraps = [];
+  petalBox.innerHTML = '';
+  $('giftScene').classList.remove('gone');
+  $('gift').classList.remove('open');
+  $('hint').style.display = '';
+}
+$('btnReplay').addEventListener('click', replay);
 
 // ===== Our garden =====
 function buildGarden() {
@@ -385,9 +440,6 @@ $('letter').addEventListener('click', e => { if (e.target.id === 'letter') close
 $('gardenView').addEventListener('click', e => { if (e.target.id === 'gardenView') closeAll(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
 
-// ===== Replay =====
-$('btnReplay').addEventListener('click', () => { closeAll(); playIntro(); });
-
 // ===== Music (optional, starts only when chosen) =====
 const bgm = $('bgm'), musicBtn = $('musicBtn');
 if (CONFIG.music) {
@@ -409,12 +461,11 @@ getSprites().then(s => {
   sprites = s;
   buildGarden();
   document.body.classList.add('ready');
-  playIntro();
 });
 let rt = null;
 addEventListener('resize', () => {
   clearTimeout(rt);
-  rt = setTimeout(() => { if (sprites.length && !$('letter').classList.contains('show')) build(false); }, 300);
+  rt = setTimeout(() => { if (revealed) build(false); }, 300);
 });
 </script>
 </body>

@@ -216,8 +216,7 @@ body.revealed .rv{opacity:1;transform:none}
     <div class="btns rv" style="--d:2.1s">
       <button class="btn" id="btnLetter">Read my letter</button>
       <button class="btn ghost" id="btnGarden">Our garden</button>
-      <button class="btn ghost" id="btnReasons">Why I love you</button>
-      <button class="btn ghost" id="btnReplay">Replay</button>
+            <button class="btn ghost" id="btnReplay">Replay</button>
     </div>
   </div>
 </section>
@@ -283,7 +282,7 @@ body.revealed .rv{opacity:1;transform:none}
 <script>
 // ===== EDIT YOUR PERSONAL CONTENT HERE =====
 const CONFIG = {
-  myName: "[MY NAME]",
+  myName: "dodis",
   herName: "Jo",
   callSign: "Jo",
   startDate: "",          // REPLACE: first day together, YYYY-MM-DD (drives the counter)
@@ -300,7 +299,7 @@ const CONFIG = {
     "And also sorry sab Jo og nay time nga dili ko vocal saimo when it comes sa mga away away or unsa ba hehe. Sensya kaayu. Pero thank you sa tanan tanan Jo. Thank you kay kauban japon tika hangtod ron maskig ga struggles mi sa akong fam. Thank you sa mga sacrifices nga imong gi hatag og gi buhat Jo. Thank you kaayu, na appreciate jud nako tanan Jo.",
     "And i love you always Jo hehe. Thank you thank you jud kaayu Jo. Stay pretty Jo. Iloveyouu, narako diri always ha. Mwaaa. Iloveyou so much......"
   ],
-  signature: "[Your Name]",
+  signature: "",
   reasons: [
     "[Reason 1: something she does that you love]",
     "[Reason 2: how she makes you feel]",
@@ -665,7 +664,6 @@ $('skip').addEventListener('click', skipIntro);
 $('btnReplay').addEventListener('click', replay);
 $('btnLetter').addEventListener('click', () => { $('envelope').classList.remove('open', 'gone'); $('sheet').classList.remove('show'); openOverlay('letter'); });
 $('btnGarden').addEventListener('click', () => openOverlay('gallery'));
-$('btnReasons').addEventListener('click', () => openOverlay('reasons'));
 $('heartBtn').addEventListener('click', e => { const r = e.currentTarget.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, phone() ? 8 : 14); });
 $('secret').addEventListener('click', e => {
   $('surprise').hidden = false;
@@ -724,7 +722,6 @@ $('envCard').addEventListener('keydown', e => {
 // ===== Boot =====
 fillText();
 buildLetter();
-buildReasons();
 updateCounter();
 setInterval(updateCounter, 60000);
 setupMusic();

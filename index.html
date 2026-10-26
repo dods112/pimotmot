@@ -197,7 +197,7 @@ const FALLBACK = [petalSprite('#e8557a', 14), petalSprite('#ff8fab', 22), petalS
 const IMG_SPRITES = [];
 FLOWER_FILES.forEach(src => {
   const im = new Image();
-  im.onload = () => { [60, 80, 100].forEach(sz => IMG_SPRITES.push(scaledSprite(im, sz))); };
+  im.onload = () => { [90, 120, 150].forEach(sz => IMG_SPRITES.push(scaledSprite(im, sz))); };
   im.src = src;
 });
 const pick = () => {
@@ -219,11 +219,11 @@ function pileTop(x) { return H - heights[colIndex(x)]; }
 function isFull() {
   let m = 0;
   for (let i = 0; i < NB; i++) if (heights[i] > m) m = heights[i];
-  let s = 0; for (let i = 0; i < NB; i++) s += heights[i]; return s / NB >= H * 0.85;
+  let m = Infinity; for (let i = 0; i < NB; i++) if (heights[i] < m) m = heights[i]; return m >= H * 0.9;
 }
 
 // ===== Particles =====
-const FOUNTAIN_MS = 25000;
+const FOUNTAIN_MS = 40000;
 const MIN_FOUNTAIN_MS = 3000;
 const MAX = 2400;
 let parts = [];
@@ -251,7 +251,7 @@ function spawnJet(prog) {
 
 function land(p) {
   const idx = colIndex(p.x);
-  const add = p.img.height * p.s * 0.6;
+  const add = p.img.height * p.s * 1.0;
   p.state = 'rest';
   p.vx = 0; p.vy = 0; p.g = 0;
   p.y = pileTop(p.x) - p.img.height * p.s * 0.3;
@@ -383,4 +383,5 @@ document.getElementById('replay').addEventListener('click', () => location.reloa
 </script>
 </body>
 </html>
+
 

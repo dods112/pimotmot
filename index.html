@@ -78,19 +78,28 @@ body.revealed .rv{opacity:1;transform:none}
 .close{position:absolute;top:.4rem;right:.7rem;background:none;border:0;font-size:2rem;color:#7a2a3a;line-height:1}
 .close:focus-visible{outline:2px solid var(--rose)}
 
-#gardenView .gbox{width:min(94vw,720px);max-height:92dvh;overflow-y:auto;text-align:center;color:var(--ivory);position:relative;padding:1rem}
-.gtitle{font-family:"Great Vibes",cursive;font-size:clamp(2.2rem,7vw,3.4rem);color:var(--ivory)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(.6rem,2vw,1.2rem);margin:1rem auto;max-width:560px}
-.slot{background:none;border:0;padding:0;aspect-ratio:1;position:relative;border-radius:50%}
-.slot img{width:100%;height:100%;object-fit:contain;transform:scale(0);opacity:0;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
-#gardenView.open .slot img{animation:bloomIn 1.1s cubic-bezier(.2,.9,.3,1.2) forwards}
-@keyframes bloomIn{to{transform:scale(1);opacity:1}}
-.slot:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
-.gnote{min-height:4.5em;font-size:1.25rem;font-style:italic;color:var(--blush);padding:.6rem 1rem;line-height:1.5}
+/* Our memories */
+#gardenView .gbox{width:min(94vw,760px);max-height:92dvh;overflow-y:auto;text-align:center;color:var(--ivory);position:relative;padding:1rem}
+.gtitle{font-family:"Great Vibes",cursive;font-weight:400;font-size:clamp(2.2rem,7vw,3.4rem);color:var(--ivory)}
+.mgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(.7rem,2vw,1.2rem);margin:1rem auto;max-width:700px}
+@media (min-width:700px){.mgrid{grid-template-columns:repeat(3,1fr)}}
+.mem{background:#fff7e8;border:0;padding:.6rem .6rem 1.4rem;border-radius:4px;box-shadow:0 8px 18px rgba(0,0,0,.4);transform:rotate(var(--tilt,0deg));transition:transform .25s ease}
+.mem:nth-child(3n+2){--tilt:2deg}
+.mem:nth-child(3n+3){--tilt:-2deg}
+.mem:hover{transform:rotate(0deg) translateY(-3px)}
+.mem:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.mem .frame{width:100%;aspect-ratio:3/4;background:#f3d6dc;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mem img{width:100%;height:100%;object-fit:cover;display:block}
+.mem .frame.fallback img{object-fit:contain;padding:12%;filter:saturate(1.3)}
+.mem .cap{display:block;margin-top:.5rem;font-style:italic;font-size:1rem;color:#4a1420;text-align:center}
+#gardenView.open .mem{animation:bloomIn .9s cubic-bezier(.2,.9,.3,1.2) both;animation-delay:var(--d,0s)}
+@keyframes bloomIn{from{opacity:0;transform:scale(.6) rotate(var(--tilt,0deg))}to{opacity:1;transform:scale(1) rotate(var(--tilt,0deg))}}
+.mnote{min-height:4.5em;font-size:1.25rem;font-style:italic;color:var(--blush);padding:.6rem 1rem;line-height:1.5}
+.mnote strong{display:block;font-family:"Great Vibes",cursive;font-style:normal;font-weight:400;font-size:1.8rem;color:var(--ivory);margin-bottom:.2rem}
 .gback{margin-top:.6rem}
 
 @media (prefers-reduced-motion: reduce){
-  .flower img,.petal,.gift,#hint,.slot img{animation:none !important}
+  .flower img,.petal,.gift,#hint,.mem{animation:none !important}
   .rv{transition:none}
 }
 </style>
@@ -143,11 +152,11 @@ body.revealed .rv{opacity:1;transform:none}
   </div>
 </div>
 
-<div id="gardenView" class="overlay" role="dialog" aria-modal="true" aria-label="Our garden">
+<div id="gardenView" class="overlay" role="dialog" aria-modal="true" aria-label="Our memories">
   <div class="gbox">
-    <h2 class="gtitle">Our garden</h2>
-    <div class="grid" id="gGrid"></div>
-    <p class="gnote" id="gNote">Tap a flower to read its note.</p>
+    <h2 class="gtitle">Our memories</h2>
+    <div class="mgrid" id="mGrid"></div>
+    <p class="mnote" id="mNote">Tap a memory to read it.</p>
     <button class="btn ghost gback" id="gBack">← Back to greeting</button>
   </div>
 </div>
@@ -168,16 +177,14 @@ const CONFIG = {
     "[Paragraph 2: a favorite memory you share.]",
     "[Paragraph 3: what you look forward to.]"
   ],
-  gardenNotes: [
-    "[Garden note 1: a shared memory]",
-    "[Garden note 2: a sweet message]",
-    "[Garden note 3: something you love about her]",
-    "[Garden note 4: a place you went together]",
-    "[Garden note 5: a promise for the next month]",
-    "[Garden note 6: a funny moment]",
-    "[Garden note 7: why she makes you smile]",
-    "[Garden note 8: a favorite thing she said]",
-    "[Garden note 9: a thank you]"
+  // Our memories: add your photo path (e.g. "memories/1.jpg") or leave "" to show a flower instead
+  memories: [
+    { photo: "", title: "[Memory 1 title]", text: "[Describe this memory in a sentence or two.]" },
+    { photo: "", title: "[Memory 2 title]", text: "[Describe this memory in a sentence or two.]" },
+    { photo: "", title: "[Memory 3 title]", text: "[Describe this memory in a sentence or two.]" },
+    { photo: "", title: "[Memory 4 title]", text: "[Describe this memory in a sentence or two.]" },
+    { photo: "", title: "[Memory 5 title]", text: "[Describe this memory in a sentence or two.]" },
+    { photo: "", title: "[Memory 6 title]", text: "[Describe this memory in a sentence or two.]" }
   ],
   music: "music/song.mp3"   // put your file in a music folder, or set to "" to hide the button
 };
@@ -282,7 +289,7 @@ function build(intro) {
     for (let c = -1; c < cols - 1; c++) {
       const ox = (c + .5) * cell + rand(-.35, .35) * cell;
       const oy = (r + .5) * cell + rand(-.35, .35) * cell;
-      items.push({ ox, oy, size: cell * rand(1.3, 1.7), layer: 2, op: rand(.75, .9) });
+      items.push({ ox, oy, size: cell * rand(1.3, 1.7), layer: 2, op: 1 });
       if (Math.random() < .7) {
         items.push({ ox: ox + rand(-.2, .2) * cell, oy: oy + rand(-.2, .2) * cell,
                      size: cell * rand(1.8, 2.3), layer: 3, op: 1 });
@@ -300,7 +307,7 @@ function build(intro) {
     img.style.setProperty('--rot', rand(-45, 45).toFixed(1) + 'deg');
     img.style.setProperty('--dur', rand(5, 9).toFixed(2) + 's');
     img.style.setProperty('--delay', (-rand(0, 8)).toFixed(2) + 's');
-    img.style.opacity = 1;
+    img.style.opacity = it.op;
     w.appendChild(img);
     garden.appendChild(w);
     wraps.push(w);
@@ -389,34 +396,53 @@ function replay() {
 }
 $('btnReplay').addEventListener('click', replay);
 
-// ===== Our garden =====
-function buildGarden() {
-  const grid = $('gGrid');
+// ===== Our memories =====
+function buildMemories() {
+  const grid = $('mGrid');
   grid.innerHTML = '';
-  CONFIG.gardenNotes.forEach((_, i) => {
+  CONFIG.memories.forEach((m, i) => {
     const b = document.createElement('button');
-    b.className = 'slot';
+    b.className = 'mem';
     b.type = 'button';
     b.dataset.i = i;
-    b.setAttribute('aria-label', 'Flower ' + (i + 1));
+    b.style.setProperty('--d', (i * 0.15) + 's');
+    const frame = document.createElement('div');
+    frame.className = 'frame';
     const img = document.createElement('img');
-    img.src = sprites[i % sprites.length];
-    img.alt = '';
-    img.style.animationDelay = (i * 0.18) + 's';
-    b.appendChild(img);
+    img.alt = m.title;
+    if (m.photo) {
+      img.src = m.photo;
+    } else {
+      frame.classList.add('fallback');
+      img.src = sprites[i % sprites.length];
+      img.alt = '';
+    }
+    frame.appendChild(img);
+    const cap = document.createElement('span');
+    cap.className = 'cap';
+    cap.textContent = m.title;
+    b.appendChild(frame);
+    b.appendChild(cap);
     grid.appendChild(b);
   });
 }
-$('gGrid').addEventListener('click', e => {
-  const slot = e.target.closest('.slot');
-  if (!slot) return;
-  $('gNote').textContent = CONFIG.gardenNotes[slot.dataset.i];
+$('mGrid').addEventListener('click', e => {
+  const card = e.target.closest('.mem');
+  if (!card) return;
+  const m = CONFIG.memories[card.dataset.i];
+  const note = $('mNote');
+  note.innerHTML = '';
+  const t = document.createElement('strong');
+  t.textContent = m.title;
+  const p = document.createElement('span');
+  p.textContent = m.text;
+  note.append(t, p);
 });
 $('btnGarden').addEventListener('click', () => {
   const g = $('gardenView');
   g.classList.remove('open');
   g.classList.add('show');
-  $('gNote').textContent = 'Tap a flower to read its note.';
+  $('mNote').textContent = 'Tap a memory to read it.';
   requestAnimationFrame(() => g.classList.add('open'));
 });
 $('gBack').addEventListener('click', closeAll);
@@ -459,7 +485,7 @@ if (CONFIG.music) {
 // ===== Boot =====
 getSprites().then(s => {
   sprites = s;
-  buildGarden();
+  buildMemories();
   document.body.classList.add('ready');
 });
 let rt = null;
@@ -470,4 +496,3 @@ addEventListener('resize', () => {
 </script>
 </body>
 </html>
-

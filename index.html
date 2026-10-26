@@ -219,7 +219,7 @@ function pileTop(x) { return H - heights[colIndex(x)]; }
 function isFull() {
   let m = 0;
   for (let i = 0; i < NB; i++) if (heights[i] > m) m = heights[i];
-  let m = Infinity; for (let i = 0; i < NB; i++) if (heights[i] < m) m = heights[i]; return m >= H * 0.9;
+  let lowest = Infinity; for (let i = 0; i < NB; i++) if (heights[i] < lowest) lowest = heights[i]; return lowest >= H * 0.9;
 }
 
 // ===== Particles =====
@@ -383,5 +383,6 @@ document.getElementById('replay').addEventListener('click', () => location.reloa
 </script>
 </body>
 </html>
+
 
 

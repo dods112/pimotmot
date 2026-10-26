@@ -219,13 +219,13 @@ function pileTop(x) { return H - heights[colIndex(x)]; }
 function isFull() {
   let m = 0;
   for (let i = 0; i < NB; i++) if (heights[i] > m) m = heights[i];
-  return m >= H * 0.72;
+  let s = 0; for (let i = 0; i < NB; i++) s += heights[i]; return s / NB >= H * 0.85;
 }
 
 // ===== Particles =====
-const FOUNTAIN_MS = 9000;
+const FOUNTAIN_MS = 25000;
 const MIN_FOUNTAIN_MS = 3000;
-const MAX = 700;
+const MAX = 2400;
 let parts = [];
 let phase = 'idle';   // idle -> fountain -> boom -> done
 let t0 = null, flash = 0, boomX = 0, boomY = 0;
@@ -251,7 +251,7 @@ function spawnJet(prog) {
 
 function land(p) {
   const idx = colIndex(p.x);
-  const add = p.img.height * p.s * 0.28;
+  const add = p.img.height * p.s * 0.6;
   p.state = 'rest';
   p.vx = 0; p.vy = 0; p.g = 0;
   p.y = pileTop(p.x) - p.img.height * p.s * 0.3;
@@ -296,7 +296,7 @@ function tick(now) {
 
   if (phase === 'fountain') {
     const prog = Math.min(1, t / FOUNTAIN_MS);
-    const n = Math.floor(2 + prog * 7);
+    const n = Math.floor(6 + prog * 14);
     for (let i = 0; i < n && parts.length < MAX; i++) spawnJet(prog);
     if ((t >= MIN_FOUNTAIN_MS && isFull()) || t >= FOUNTAIN_MS) startBoom();
   }
@@ -383,3 +383,4 @@ document.getElementById('replay').addEventListener('click', () => location.reloa
 </script>
 </body>
 </html>
+

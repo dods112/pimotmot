@@ -67,7 +67,7 @@ body.revealed .rv{opacity:1;transform:none}
 .card{position:relative;background:linear-gradient(160deg,#fff7e8,#f5e4c6);color:#4a1420;width:min(90vw,440px);padding:1.4rem 1.5rem 1.7rem;border-radius:6px 6px 10px 10px;box-shadow:0 14px 30px rgba(0,0,0,.45)}
 .card .for{font-style:italic;font-size:clamp(1rem,3.8vw,1.1rem);margin-bottom:.4rem}
 .card .msg{font-size:clamp(1.05rem,4vw,1.2rem);line-height:1.6;overflow-wrap:break-word}
-.heartBtn{position:absolute;right:12px;bottom:-18px;width:46px;height:46px;min-width:44px;min-height:44px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e0506f,#8a1630);color:var(--ivory);font-size:1.2rem;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.heartBtn{position:fixed;right:14px;bottom:calc(14px + var(--sb));z-index:12;width:46px;height:46px;min-width:44px;min-height:44px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e0506f,#8a1630);color:var(--ivory);font-size:1.2rem;box-shadow:0 4px 10px rgba(0,0,0,.35)}
 .counter{font-size:clamp(1.05rem,4vw,1.25rem);color:var(--gold);text-shadow:0 1px 8px rgba(0,0,0,.7)}
 .counterDays{font-size:clamp(.9rem,3.2vw,1rem);letter-spacing:.12em;color:var(--blush);text-shadow:0 1px 8px rgba(0,0,0,.7)}
 .quote{font-family:"Great Vibes",cursive;font-size:clamp(1.5rem,6.5vw,2.2rem);line-height:1.35;max-width:600px;text-shadow:0 2px 12px rgba(0,0,0,.7);padding:0 .4rem}
@@ -76,17 +76,23 @@ body.revealed .rv{opacity:1;transform:none}
 .btn.ghost{background:rgba(59,7,16,.6);border:1px solid var(--gold);color:var(--ivory)}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
-/* Card envelope */
-.envCard{cursor:pointer;overflow:visible}
-.envCard::before{content:"";position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(#f0dcaa,#e2c48a);clip-path:polygon(0 0,100% 0,50% 100%);border-radius:6px 6px 0 0;transform-origin:top center;transition:transform .8s ease;z-index:2;pointer-events:none}
-.envCard.open::before{transform:rotateX(180deg)}
-.envCard:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
-.tapHint{margin-top:.8rem;font-style:italic;font-size:.95rem;color:#8a4a58;letter-spacing:.06em}
 
 /* Word-by-word letter text */
 .para{opacity:1;animation:none}
 .w{display:inline-block;opacity:0;transform:translateY(8px);animation:wordIn .5s ease forwards;animation-delay:var(--wd,0s)}
 @keyframes wordIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* Envelope card */
+.envCard{position:relative;width:min(88vw,460px);height:min(58vw,280px);max-height:300px;min-height:200px;padding:0;border-radius:6px;background:linear-gradient(160deg,#fbf0d8,#f1dcb0);box-shadow:0 18px 36px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.35);cursor:pointer;overflow:visible;transition:transform .4s ease,box-shadow .4s ease}
+.envCard:hover{transform:translateY(-3px)}
+.envCard::before{content:"";position:absolute;inset:0;border-radius:6px;background:repeating-linear-gradient(35deg,rgba(150,110,50,.04) 0 2px,transparent 2px 6px);pointer-events:none}
+.envCard::after{content:"";position:absolute;left:0;right:0;top:0;height:50%;background:linear-gradient(#f0dcaa,#dfc386);clip-path:polygon(0 0,100% 0,50% 100%);border-radius:6px 6px 0 0;transform-origin:top center;transition:transform .9s cubic-bezier(.3,.7,.3,1),z-index 0s .4s;z-index:2;pointer-events:none;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.envCard.open::after{transform:rotateX(180deg);z-index:0}
+.envFace{position:absolute;left:0;right:0;bottom:14%;display:flex;flex-direction:column;align-items:center;gap:.5rem;z-index:3;pointer-events:none}
+.envWax{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#d24a66,#8a1630);color:var(--ivory);display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.tapHint{font-style:italic;font-size:1rem;letter-spacing:.08em;color:#8a4a58}
+.envCard:focus-visible{outline:2px solid var(--gold);outline-offset:5px}
+.envCard .heartBtn{display:none}
 
 /* Music */
 #musicBar{position:fixed;top:calc(.8rem + var(--st));right:calc(.8rem + env(safe-area-inset-right,0px));z-index:40;display:flex;align-items:center;gap:.5rem;background:rgba(59,7,16,.8);border:1px solid var(--gold);border-radius:999px;padding:.2rem .6rem .2rem .2rem;max-width:calc(100vw - 2rem)}

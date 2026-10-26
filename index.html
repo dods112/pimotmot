@@ -76,6 +76,13 @@ body.revealed .rv{opacity:1;transform:none}
 .btn.ghost{background:rgba(59,7,16,.6);border:1px solid var(--gold);color:var(--ivory)}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
+/* Card envelope */
+.envCard{cursor:pointer;overflow:visible}
+.envCard::before{content:"";position:absolute;left:0;right:0;top:0;height:46%;background:linear-gradient(#f0dcaa,#e2c48a);clip-path:polygon(0 0,100% 0,50% 100%);border-radius:6px 6px 0 0;transform-origin:top center;transition:transform .8s ease;z-index:2;pointer-events:none}
+.envCard.open::before{transform:rotateX(180deg)}
+.envCard:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.tapHint{margin-top:.8rem;font-style:italic;font-size:.95rem;color:#8a4a58;letter-spacing:.06em}
+
 /* Music */
 #musicBar{position:fixed;top:calc(.8rem + var(--st));right:calc(.8rem + env(safe-area-inset-right,0px));z-index:40;display:flex;align-items:center;gap:.5rem;background:rgba(59,7,16,.8);border:1px solid var(--gold);border-radius:999px;padding:.2rem .6rem .2rem .2rem;max-width:calc(100vw - 2rem)}
 #musicBtn{width:44px;height:44px;border-radius:50%;background:var(--rose);color:#fff;font-size:1rem;flex:0 0 auto}
@@ -186,9 +193,10 @@ body.revealed .rv{opacity:1;transform:none}
   <div id="heroInner">
     <p class="kicker rv" style="--d:0s" id="kicker"></p>
     <h1 class="heading rv" style="--d:.4s" id="heading"></h1>
-    <div class="card rv" style="--d:.9s">
+    <div class="card rv envCard" id="envCard" role="button" tabindex="0" aria-label="Open the letter" style="--d:.9s">
       <p class="for" id="forLine"></p>
       <p class="msg" id="cardMsg"></p>
+      <p class="tapHint">Tap to open</p>
       <button class="heartBtn" id="heartBtn" aria-label="Send a burst of petals">♥</button>
     </div>
     <p class="counter rv" style="--d:1.3s" id="counter"></p>
@@ -674,6 +682,23 @@ let rt = null;
 addEventListener('resize', () => {
   clearTimeout(rt);
   rt = setTimeout(() => { if (revealed) build(false); }, 300);
+});
+
+// ===== Card envelope opens the letter =====
+function openFromCard() {
+  const c = $('envCard');
+  c.classList.add('open');
+  $('envelope').classList.remove('open', 'gone');
+  $('sheet').classList.remove('show');
+  openOverlay('letter');
+  setTimeout(openEnvelope, 700);
+}
+$('envCard').addEventListener('click', e => {
+  if (e.target.closest('.heartBtn')) return;
+  openFromCard();
+});
+$('envCard').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.heartBtn')) { e.preventDefault(); openFromCard(); }
 });
 
 // ===== Boot =====

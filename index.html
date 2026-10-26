@@ -10,7 +10,6 @@
 html,body{height:100%}
 body{background:#3e0a12;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,serif;overflow:hidden}
 .script{font-family:"Great Vibes",cursive;font-weight:400}
-
 #gift-scene{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;background:radial-gradient(ellipse at center,#7a1a29 0%,#4a0c16 60%,#2c060d 100%);z-index:4;transition:opacity 1s ease}
 #gift-scene.gone{opacity:0;pointer-events:none}
 #greet{font-size:clamp(1.8rem,6vw,2.8rem);text-align:center;padding:0 1rem;opacity:0;animation:up 1.6s ease .3s forwards}
@@ -29,9 +28,7 @@ body{background:#3e0a12;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,s
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 @keyframes blink{0%,100%{opacity:.3}50%{opacity:.9}}
 @keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-
-#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;transition:opacity 1.5s ease}
 #scrap{position:fixed;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 1.6s ease;z-index:3;background:radial-gradient(ellipse at 50% 30%,#8a2234 0%,#4a0c16 70%,#2c060d 100%)}
 #scrap.show{opacity:1;pointer-events:auto}
 .scrap-inner{min-height:100%;display:flex;flex-direction:column;align-items:center;padding:3rem 1.2rem 5rem;gap:1.6rem}
@@ -43,7 +40,6 @@ body{background:#3e0a12;color:#fbe9dc;font-family:"Cormorant Garamond",Georgia,s
 .actions{display:flex;flex-wrap:wrap;gap:.8rem;justify-content:center}
 .btn{font:inherit;font-style:italic;font-size:1.1rem;color:#fff;background:#b8243f;border:0;padding:.7rem 1.5rem;border-radius:999px;cursor:pointer;text-decoration:none;box-shadow:0 8px 18px rgba(0,0,0,.35)}
 .btn.ghost{background:transparent;border:1px solid #f5c2cf}
-
 #letter{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(20,2,6,.6);z-index:20;padding:1.2rem}
 #letter.show{display:flex}
 .letter-paper{position:relative;background:#f8eedb;color:#3e1220;width:min(92vw,560px);max-height:88vh;overflow-y:auto;padding:2rem 1.8rem;box-shadow:0 18px 40px rgba(0,0,0,.5);animation:unfold .9s ease both}
@@ -113,7 +109,6 @@ const CONFIG = {
   finalMessage: "Every day with you is another flower in our little garden."
 };
 
-// ===== FLOWER IMAGES (saved in the flowers folder) =====
 const FLOWER_FILES = [
   "flowers/flower1.webp", "flowers/flower2.webp", "flowers/flower3.webp",
   "flowers/flower4.webp", "flowers/flower5.webp", "flowers/flower6.webp"
@@ -147,7 +142,7 @@ resize();
 
 const rnd = (a, b) => a + Math.random() * (b - a);
 
-// ===== Flower sprites: remove the outer white/checkered background =====
+// ===== Sprites: remove the outer white/checkered background =====
 function scaledSprite(img, size) {
   const c = document.createElement('canvas');
   c.width = c.height = size;
@@ -180,7 +175,7 @@ function scaledSprite(img, size) {
       if (cy < size - 1) addIfBg(i + size);
     }
     x.putImageData(d, 0, 0);
-  } catch (e) { /* keep the image as-is if the browser blocks it */ }
+  } catch (e) { /* keep the image as-is if blocked */ }
   return c;
 }
 function petalSprite(color, r) {
@@ -202,7 +197,7 @@ const FALLBACK = [petalSprite('#e8557a', 14), petalSprite('#ff8fab', 22), petalS
 const IMG_SPRITES = [];
 FLOWER_FILES.forEach(src => {
   const im = new Image();
-  im.onload = () => { [60, 85, 115].forEach(sz => IMG_SPRITES.push(scaledSprite(im, sz))); };
+  im.onload = () => { [60, 80, 100].forEach(sz => IMG_SPRITES.push(scaledSprite(im, sz))); };
   im.src = src;
 });
 const pick = () => {
@@ -210,57 +205,88 @@ const pick = () => {
   return list[(Math.random() * list.length) | 0];
 };
 
-// ===== Water fountain + pile-up + explosion =====
-const FOUNTAIN_MS = 6500;
-const MAX = 650;
+// ===== Water pile model =====
+// The screen floor is split into columns. Each column stores how tall the pile is.
+// A flower that lands raises its column, so the pile grows up the screen.
+const BUCKET = 22;
+let NB = 0, heights = null;
+function initPile() {
+  NB = Math.ceil(W / BUCKET) + 1;
+  heights = new Float32Array(NB);
+}
+function colIndex(x) { return Math.max(0, Math.min(NB - 1, Math.floor(x / BUCKET))); }
+function pileTop(x) { return H - heights[colIndex(x)]; }
+function isFull() {
+  let m = 0;
+  for (let i = 0; i < NB; i++) if (heights[i] > m) m = heights[i];
+  return m >= H * 0.72;
+}
+
+// ===== Particles =====
+const FOUNTAIN_MS = 9000;
+const MIN_FOUNTAIN_MS = 3000;
+const MAX = 700;
 let parts = [];
 let phase = 'idle';   // idle -> fountain -> boom -> done
 let t0 = null, flash = 0, boomX = 0, boomY = 0;
 
-// Three fountains: left, center, right along the bottom
-function fountainPoints() {
-  return [
-    { x: W * 0.15, y: H + 10, ang: -Math.PI / 2 + 0.35 },
-    { x: W * 0.5,  y: H + 10, ang: -Math.PI / 2 },
-    { x: W * 0.85, y: H + 10, ang: -Math.PI / 2 - 0.35 }
-  ];
-}
-function spawnFountain(f, power) {
-  const a = f.ang + rnd(-0.28, 0.28);
-  const sp = rnd(12, 18) * power;
+function spawnJet(prog) {
+  const k = Math.sqrt(H / 900);
+  const jets = [W * 0.2, W * 0.5, W * 0.8];
+  const fx = jets[(Math.random() * jets.length) | 0];
+  const ang = -Math.PI / 2 + rnd(-0.35, 0.35);
+  const sp = rnd(18, 24) * k * (0.9 + prog * 0.2);
+  const img = pick();
+  const target = rnd(0.6, 1.1);
   parts.push({
-    x: f.x + rnd(-10, 10), y: f.y,
-    vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
-    rot: rnd(0, 6.28), vr: rnd(-0.08, 0.08),
-    s: 0, target: rnd(0.6, 1.2),
-    g: 0.42, drag: 0.994, bounce: true,
-    life: 1, decay: 0, img: pick()
+    state: 'air',
+    x: fx + rnd(-14, 14), y: H - 6,
+    vx: Math.cos(ang) * sp * 0.6, vy: Math.sin(ang) * sp,
+    rot: rnd(0, 6.28), vr: rnd(-0.06, 0.06),
+    s: 0.2, target, g: 0.35,
+    half: img.height * target * 0.5,
+    life: 1, decay: 0, drag: 1, img
   });
 }
-function explode() {
+
+function land(p) {
+  const idx = colIndex(p.x);
+  const add = p.img.height * p.s * 0.28;
+  p.state = 'rest';
+  p.vx = 0; p.vy = 0; p.g = 0;
+  p.y = pileTop(p.x) - p.img.height * p.s * 0.3;
+  heights[idx] = Math.min(H * 0.95, heights[idx] + add);
+  if (idx > 0) heights[idx - 1] = Math.min(H * 0.95, heights[idx - 1] + add * 0.5);
+  if (idx < NB - 1) heights[idx + 1] = Math.min(H * 0.95, heights[idx + 1] + add * 0.5);
+}
+
+function startBoom() {
+  phase = 'boom';
   boomX = W / 2; boomY = H * 0.45;
-  // every flower already on screen flies outward from the burst point
   parts.forEach(p => {
+    if (p.state === 'fly') return;
     const dx = p.x - boomX, dy = p.y - boomY;
     const d = Math.hypot(dx, dy) || 1;
-    const sp = rnd(10, 24);
-    p.vx = (dx / d) * sp + rnd(-2, 2);
-    p.vy = (dy / d) * sp + rnd(-2, 2);
-    p.g = 0.12; p.drag = 0.985; p.bounce = false;
+    const sp = rnd(8, 22);
+    p.state = 'fly';
+    p.vx = (dx / d) * sp + rnd(-1.5, 1.5);
+    p.vy = (dy / d) * sp + rnd(-1.5, 1.5);
+    p.g = 0.12; p.drag = 0.985;
     p.vr = rnd(-0.25, 0.25);
     p.s = p.target;
-    p.decay = rnd(0.003, 0.006);
+    p.decay = rnd(0.004, 0.008);
   });
-  // extra fresh burst from the center
-  for (let i = 0; i < 160; i++) {
-    const a = rnd(0, Math.PI * 2), sp = rnd(6, 26);
+  for (let i = 0; i < 140; i++) {
+    const a = rnd(0, Math.PI * 2), sp = rnd(6, 24);
     parts.push({
-      x: boomX, y: boomY, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
-      rot: rnd(0, 6.28), vr: rnd(-0.2, 0.2), s: rnd(0.4, 1.1), target: rnd(0.4, 1.1),
-      g: 0.1, drag: 0.98, bounce: false, life: 1, decay: rnd(0.006, 0.012), img: pick()
+      state: 'fly', x: boomX, y: boomY,
+      vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+      rot: rnd(0, 6.28), vr: rnd(-0.2, 0.2), s: rnd(0.4, 1.0), target: 1,
+      g: 0.1, drag: 0.98, life: 1, decay: rnd(0.006, 0.012), img: pick()
     });
   }
   flash = 1;
+  setTimeout(openAfterBoom, 1800);
 }
 
 function tick(now) {
@@ -270,50 +296,26 @@ function tick(now) {
 
   if (phase === 'fountain') {
     const prog = Math.min(1, t / FOUNTAIN_MS);
-    const count = Math.floor(3 + prog * 10);       // ramps up like water pressure
-    const fps = fountainPoints();
-    for (let i = 0; i < count && parts.length < MAX; i++) {
-      spawnFountain(fps[(Math.random() * 3) | 0], 0.85 + prog * 0.35);
-    }
-    if (t >= FOUNTAIN_MS) {
-      phase = 'boom';
-      explode();
-      setTimeout(openAfterBoom, 1800);
-    }
-  }
-
-  if (flash > 0.01) {
-    const g = ctx.createRadialGradient(boomX, boomY, 0, boomX, boomY, Math.max(W, H) * 0.6);
-    g.addColorStop(0, 'rgba(255,225,235,' + (flash * 0.55) + ')');
-    g.addColorStop(1, 'rgba(255,225,235,0)');
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-    flash *= 0.9;
+    const n = Math.floor(2 + prog * 7);
+    for (let i = 0; i < n && parts.length < MAX; i++) spawnJet(prog);
+    if ((t >= MIN_FOUNTAIN_MS && isFull()) || t >= FOUNTAIN_MS) startBoom();
   }
 
   for (const p of parts) {
-    p.x += p.vx; p.y += p.vy;
-    p.vx *= p.drag;
-    p.vy = p.vy * p.drag + p.g;
-    p.rot += p.vr;
-    if (p.s < p.target) p.s = Math.min(p.target, p.s + 0.06);
-
-    if (p.bounce) {
-      // water-like pile: flowers land on the bottom and on each other, and spread sideways
-      const floor = H - p.img.height * 0.25 * p.s;
-      if (p.y > floor) {
-        p.y = floor;
-        p.vy *= -0.25;
-        p.vx *= 0.82;
-        p.vr *= 0.7;
-      }
-      if (p.x < 0) { p.x = 0; p.vx = Math.abs(p.vx) * 0.5; }
-      if (p.x > W) { p.x = W; p.vx = -Math.abs(p.vx) * 0.5; }
-      if (p.y < -60) p.life = 0;   // only very high flowers fall away
-    } else {
+    if (p.state === 'air') {
+      p.vy += p.g;
+      p.x += p.vx; p.y += p.vy;
+      p.vx *= 0.995;
+      p.rot += p.vr;
+      if (p.s < p.target) p.s = Math.min(p.target, p.s + 0.08);
+      if (p.vy > 0 && p.y + p.half >= pileTop(p.x)) land(p);
+    } else if (p.state === 'fly') {
+      p.x += p.vx; p.y += p.vy;
+      p.vx *= p.drag;
+      p.vy = p.vy * p.drag + p.g;
+      p.rot += p.vr;
       p.life -= p.decay;
     }
-
     if (p.life <= 0) continue;
     ctx.save();
     ctx.globalAlpha = Math.min(1, p.life);
@@ -323,11 +325,18 @@ function tick(now) {
     ctx.drawImage(p.img, -p.img.width / 2, -p.img.height / 2);
     ctx.restore();
   }
-  parts = parts.filter(p => p.life > 0 && (p.bounce || (p.x > -200 && p.x < W + 200 && p.y > -200 && p.y < H + 200)));
+  parts = parts.filter(p => p.life > 0 && (p.state !== 'fly' || (p.y > -200 && p.y < H + 200 && p.x > -200 && p.x < W + 200)));
 
-  if (phase !== 'done' && (phase === 'fountain' || parts.length || flash > 0.01)) {
-    requestAnimationFrame(tick);
-  } else if (phase === 'boom') {
+  if (flash > 0.01) {
+    const g = ctx.createRadialGradient(boomX, boomY, 0, boomX, boomY, Math.max(W, H) * 0.6);
+    g.addColorStop(0, 'rgba(255,225,235,' + (flash * 0.5) + ')');
+    g.addColorStop(1, 'rgba(255,225,235,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    flash *= 0.9;
+  }
+
+  if (phase !== 'idle' && (phase !== 'done' || parts.length || flash > 0.01)) {
     requestAnimationFrame(tick);
   }
 }
@@ -345,11 +354,10 @@ function showScrap() {
   scrap.setAttribute('aria-hidden', 'false');
 }
 function openAfterBoom() {
+  phase = 'done';
   showScrap();
   letter.classList.add('show');
-  phase = 'done';
-  cv.style.transition = 'opacity 1.5s ease';
-  setTimeout(() => { cv.style.opacity = '0'; }, 2500);
+  cv.style.opacity = '0';
 }
 
 function start() {
@@ -361,6 +369,7 @@ function start() {
     return;
   }
   giftScene.classList.add('gone');
+  initPile();
   phase = 'fountain';
   t0 = null;
   requestAnimationFrame(tick);

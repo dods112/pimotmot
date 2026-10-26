@@ -17,11 +17,11 @@ button{font:inherit;cursor:pointer}
 body.ready #glow{opacity:1}
 #garden{z-index:1}
 #petals{z-index:2}
-#veil{z-index:3;opacity:0;background:radial-gradient(ellipse at center,rgba(59,7,16,.7) 0%,rgba(59,7,16,.3) 55%,rgba(59,7,16,.05) 100%);transition:opacity 1.4s ease}
+#veil{z-index:3;opacity:0;background:radial-gradient(ellipse at center,rgba(59,7,16,.35) 0%,rgba(59,7,16,.12) 55%,rgba(59,7,16,0) 100%);transition:opacity 1.4s ease}
 body.bursting #veil,body.revealed #veil{opacity:1}
 
 .flower{position:absolute;pointer-events:none}
-.flower img{width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;transform-origin:50% 60%;animation:sway var(--dur,7s) ease-in-out var(--delay,0s) infinite alternate}
+.flower img{width:100%;height:100%;display:block;user-select:none;-webkit-user-drag:none;transform-origin:50% 60%;filter:saturate(1.35) contrast(1.1);animation:sway var(--dur,7s) ease-in-out var(--delay,0s) infinite alternate}
 @keyframes sway{from{transform:rotate(calc(var(--rot) - 4deg))}to{transform:rotate(calc(var(--rot) + 4deg)) translateY(-5px)}}
 .petal{position:absolute;top:-60px;width:30px;height:auto;animation:fall linear infinite;opacity:.9}
 @keyframes fall{from{transform:translate(0,-8vh) rotate(0deg)}to{transform:translate(28vw,118vh) rotate(540deg)}}
@@ -300,7 +300,7 @@ function build(intro) {
     img.style.setProperty('--rot', rand(-45, 45).toFixed(1) + 'deg');
     img.style.setProperty('--dur', rand(5, 9).toFixed(2) + 's');
     img.style.setProperty('--delay', (-rand(0, 8)).toFixed(2) + 's');
-    img.style.opacity = it.op;
+    img.style.opacity = 1;
     w.appendChild(img);
     garden.appendChild(w);
     wraps.push(w);
@@ -470,3 +470,4 @@ addEventListener('resize', () => {
 </script>
 </body>
 </html>
+
